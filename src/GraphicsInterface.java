@@ -21,7 +21,7 @@ public class GraphicsInterface extends JFrame {
     // final xboxControllerTest connectController = new xboxControllerTest();
     private JComboBox commPorts;
     private JTextArea console;
-    private JButton initialize;
+    private JButton initialize, refresh;
     private JLabel batteryVoltage, limitSwitchZero, limitSwitchOne, encoderLeftFront,
             encoderLeftRear,encoderRightFront,encoderRightRear;
     private String[] portList = {};
@@ -64,13 +64,13 @@ public class GraphicsInterface extends JFrame {
 
 
         commPorts = new JComboBox(engage.getPorts().toArray());
-        commPorts.setLocation(250,50);
+        commPorts.setLocation(350,50);
         commPorts.setSize(100,30);
         //commPorts.setSelectedIndex(0);
         GraphicsInterfacePane.add(commPorts);
 
         initialize = new JButton();
-        initialize.setText("initialize");
+        initialize.setText("Initialize");
         initialize.setSize(130,50);
         initialize.setLocation(50,50);
         initialize.addActionListener(
@@ -84,7 +84,7 @@ public class GraphicsInterface extends JFrame {
                             engage.portConnect();
                             initiateController = new SerialWorker();
                             initiateController.execute();
-                            initialize.setText("disconnect");
+                            initialize.setText("Disconnect");
                             isConnected = true;
                             canceldashboard = false;
                             //updateDashboard();
@@ -103,6 +103,26 @@ public class GraphicsInterface extends JFrame {
                 }
         );
         GraphicsInterfacePane.add(initialize);
+
+        refresh = new JButton();
+        refresh.setText("Refresh Ports");
+        refresh.setSize(130,50);
+        refresh.setLocation(190, 50);
+        refresh.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (initialize.getText().equals("Initialize")){
+                            engage.searchForPorts();
+                            commPorts.removeAllItems();
+                            for (int i = 0; i < engage.getPorts().size(); i++){
+                                commPorts.addItem(engage.getPorts().get(i));
+                            }
+                        }
+                    }
+                }
+        );
+        GraphicsInterfacePane.add(refresh);
 
         batteryVoltage = new JLabel();
         batteryVoltage.setText(String.format("Battery Voltage: %s", voltage)+'v');
@@ -125,27 +145,26 @@ public class GraphicsInterface extends JFrame {
         encoderLeftFront = new JLabel();
         encoderLeftFront.setText("Front Left RPM: 0");
         encoderLeftFront.setSize(150, 30);
-        encoderLeftFront.setLocation(270, 120);
+        encoderLeftFront.setLocation(270, 150);
         GraphicsInterfacePane.add(encoderLeftFront);
+
+        encoderRightFront = new JLabel();
+        encoderRightFront.setText("Front Right RPM: 0");
+        encoderRightFront.setSize(150, 30);
+        encoderRightFront.setLocation(420, 150);
+        GraphicsInterfacePane.add(encoderRightFront);
 
         encoderLeftRear = new JLabel();
         encoderLeftRear.setText("Rear Left RPM: 0");
         encoderLeftRear.setSize(150, 30);
-        encoderLeftRear.setLocation(50, 260);
+        encoderLeftRear.setLocation(270, 170);
         GraphicsInterfacePane.add(encoderLeftRear);
 
         encoderRightRear = new JLabel();
         encoderRightRear.setText("Rear Right RPM: 0");
         encoderRightRear.setSize(150, 30);
-        encoderRightRear.setLocation(200, 260);
+        encoderRightRear.setLocation(420, 170);
         GraphicsInterfacePane.add(encoderRightRear);
-
-        encoderRightFront = new JLabel();
-        encoderRightFront.setText("Front Right RPM: 0");
-        encoderRightFront.setSize(150, 30);
-        encoderRightFront.setLocation(420, 120);
-        GraphicsInterfacePane.add(encoderRightFront);
-
 
         setTitle("RoboSmokey 3000 Control Interface");
         setSize(800,600);

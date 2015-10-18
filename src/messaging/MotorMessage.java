@@ -32,12 +32,12 @@ public class MotorMessage implements IMessage {
 
     Motor motorId;
     int motorPower;
-    public static final int MAX_POWER = 180;
+    public static final double MAX_POWER = 200;
 
     public MotorMessage(Motor motorId, double motorPower){
 
         this.motorId = motorId;
-        this.motorPower = (int)(motorPower * MAX_POWER/2 + MAX_POWER/2);
+        this.motorPower = (int)(motorPower * Math.floor(MAX_POWER/2) + Math.floor(MAX_POWER/2));
 
     }
 
@@ -45,8 +45,8 @@ public class MotorMessage implements IMessage {
         assert data.length == 4;
 
         int i = 2;
-        this.motorId = Motor.fromByte(data[i++]);
-        this.motorPower = (int)data[i++];
+        this.motorId = Motor.fromByte(data[++i]);
+        this.motorPower = (int)data[++i];
     }
 
     public byte[] getBytes(){

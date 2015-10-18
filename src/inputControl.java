@@ -1,3 +1,4 @@
+import messaging.KillMessage;
 import net.java.games.input.*;
 
 /**
@@ -20,16 +21,15 @@ public class inputControl {
         double yaxis = 0;
         double xrotation = 0;
         double yrotation = 0;
-        double throttleLeft;
-        double throttleRight;
-        double leftDirection;
-        double rightDirection;
+        double aux_flipper_val = .6;
+        boolean isKilled = false;
 
         Controller[] ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
         Controller xboxController = null;
 
         for (int i = 0; i < ca.length && xboxController == null; i++) {
-            if (ca[i].getName().equals("XBOX 360 For Windows (Controller)")) {
+            //System.out.println(ca[i].getName());
+            if (ca[i].getName().equals("XBOX 360 For Windows (Controller)") || ca[i].getName().equals("Controller (XBOX 360 For Windows)")) {
                 xboxController = ca[i];
                 System.out.println(xboxController.getName());
             }
@@ -52,18 +52,26 @@ public class inputControl {
                 buffer.append(comp.getName()).append(" changed to ");
                 float value = event.getValue();
                 switch (event.getComponent().toString()) {
-                    case "Button 0":
+                    case "Button 7":
                             if (value == 1.0f) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 1));
-                                //System.out.println("A Button On");
+                                if (!isKilled){
+                                    writeMessage(new KillMessage(1));
+                                    isKilled = true;
+                                }
+                                else{
+                                    writeMessage(new KillMessage(0));
+                                    isKilled = false;
+                                }
+                                
                             } else {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                                continue;
                                 //System.out.println("A Button Off");
                             }
                         break;
 
                     case "Button 1":
                         if (value == 1.0f) {
+                            continue;
                             //System.out.println("B Button On");
                         } else {
                             //System.out.println("B Button Off");
@@ -72,22 +80,50 @@ public class inputControl {
 
                     case "Button 2":
                         if (value == 1.0f) {
+                            if (aux_flipper_val > 0){
+                                aux_flipper_val -= .2;
+                            }
                             //System.out.println("X Button On");
                         } else {
+                            continue;
                             //System.out.println("X Button Off");
                         }
                         break;
 
                     case "Button 3":
                         if (value == 1.0f) {
+                            if (aux_flipper_val < 1){
+                                aux_flipper_val += .2;
+                            }
                             //System.out.println("Y Button On");
                         } else {
+                            continue;
                             //System.out.println("Y Button Off");
                         }
                         break;
 
-                    case "X Axis":
+                    case "Button 4":
+                        if (value == 1.0f) {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, -1 * aux_flipper_val));
+                            //System.out.println("Left Bumper On");
+                        } else {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                            //System.out.println("Left Bumper Off");
+                        }
+                        break;
 
+                    case "Button 5":
+                        if (value == 1.0f) {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, aux_flipper_val));
+                            //System.out.println("Right Bumper On");
+                        } else {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                            //System.out.println("Right Bumper Off");
+                        }
+                        break;
+
+                    case "X Axis":
+                    /*
                         xaxis = value;
                         throttleLeft = Math.sqrt(Math.pow(xaxis, 2) + Math.pow(yaxis, 2));
                         leftDirection = Math.tan(yaxis / xaxis);
@@ -96,24 +132,25 @@ public class inputControl {
                                     Math.abs(throttleLeft * leftDirection)));
                             writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR,
                                     Math.abs(throttleLeft * leftDirection)));
-                            //System.out.println(String.format("left stick throttleLeft is %1$s and direction is %2$s", throttleLeft, leftDirection));
-                        }
+
+                        }*/
                         break;
 
                     case "Y Axis":
                         yaxis = value;
-                        throttleLeft = Math.sqrt(Math.pow(xaxis, 2) + Math.pow(yaxis, 2));
-                        leftDirection = Math.tan(yaxis / xaxis);
-                        if (throttleLeft > .2) {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR,
-                                    Math.abs(throttleLeft * leftDirection)));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR,
-                                    Math.abs(throttleLeft * leftDirection)));
+                        if (yaxis > .1 || yaxis < -.1)  {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, -1 * yaxis));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, -1 * yaxis));
                             //System.out.println(String.format("left stick throttleLeft is %1$s and direction is %2$s", throttleLeft, leftDirection));
+                        }
+                        else{
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, 0));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
                         }
                         break;
 
                     case "X Rotation":
+                        /*
                         xrotation = value;
                         throttleRight = Math.sqrt(Math.pow(xrotation, 2) + Math.pow(yrotation, 2));
                         rightDirection = Math.tan(yrotation / xrotation);
@@ -124,26 +161,26 @@ public class inputControl {
                                     Math.abs(throttleRight * rightDirection)));
                             //System.out.println(String.format("right stick throttleLeft is %1$s and direction is %2$s", throttleRight, rightDirection));
 
-                        }
+                        }*/
                         break;
 
                     case "Y Rotation":
                         yrotation = value;
-                        throttleRight = Math.sqrt(Math.pow(xrotation, 2) + Math.pow(yrotation, 2));
-                        rightDirection = Math.tan(yrotation / xrotation);
-                        if (throttleRight > .2){
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR,
-                                    Math.abs(throttleRight * rightDirection)));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR,
-                                    Math.abs(throttleRight * rightDirection)));
+                        if (yrotation > .1 || yrotation < -.1){
+                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR, -1 * yrotation));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -1 * yrotation));
                             //System.out.println(String.format("right stick throttleLeft is %1$s and direction is %2$s", throttleRight, rightDirection));
 
+                        }
+                        else{
+                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR, 0));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
                         }
                         break;
 
                     case "Z Axis":
                         //System.out.println(String.format("Z Axis Magnitude is %s", value));
-                        writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, value));
+                        writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, -1 * value));
                         break;
 
                 }

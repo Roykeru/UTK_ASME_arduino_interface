@@ -23,7 +23,7 @@ public class serialTest implements SerialPortEventListener {
     private Enumeration ports = null;
     private CommPortIdentifier portId  = null;       //my COM port
     private static final int TIME_OUT = 2000;    //time in milliseconds
-    private static final int BAUD_RATE = 9600; //baud rate to 9600bps
+    private static final int BAUD_RATE = 115200; //baud rate to 9600bps
     public static BufferedReader input;               //declaring my input buffer
     public static OutputStream output;                //declaring output stream
     private String name;        //user input name string
@@ -37,7 +37,7 @@ public class serialTest implements SerialPortEventListener {
     public void searchForPorts()
     {
         ports = CommPortIdentifier.getPortIdentifiers();
-        int i = 0;
+        portList.clear();
 
         
         while (ports.hasMoreElements()){
@@ -177,7 +177,7 @@ public class serialTest implements SerialPortEventListener {
         return lineArray;
     }
 
-    /*public static synchronized void writeData(byte[] data) {
+    public static synchronized void writeData(byte[] data) {
         System.out.println("Sent: " + data);
         try {
             output.write(data);
@@ -194,7 +194,7 @@ public class serialTest implements SerialPortEventListener {
         for (String s : lines) {
             sendLine(s);
         }
-    }*/
+    }
 
     //closePort method
     public synchronized void close(){
