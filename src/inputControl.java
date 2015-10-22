@@ -69,10 +69,20 @@ public class inputControl {
                             }
                         break;
 
+                    case "Button 0":
+                        if (value == 1.0f) {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.SERVO_MOTOR, 1));
+                           //System.out.println("B Button On");
+                        } else {
+                            //System.out.println("B Button Off");
+                        }
+                        break;
+
+
                     case "Button 1":
                         if (value == 1.0f) {
-                            continue;
-                            //System.out.println("B Button On");
+                            writeMessage(new MotorMessage(MotorMessage.Motor.SERVO_MOTOR, -1));
+
                         } else {
                             //System.out.println("B Button Off");
                         }
@@ -139,8 +149,9 @@ public class inputControl {
                     case "Y Axis":
                         yaxis = value;
                         if (yaxis > .1 || yaxis < -.1)  {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, -1 * yaxis));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, -1 * yaxis));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, 1 * yaxis));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR,
+                                    1 * yaxis));
                             //System.out.println(String.format("left stick throttleLeft is %1$s and direction is %2$s", throttleLeft, leftDirection));
                         }
                         else{

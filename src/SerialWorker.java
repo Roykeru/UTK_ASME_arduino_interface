@@ -8,6 +8,7 @@ public class SerialWorker extends SwingWorker<Integer, Integer> {
 
     protected Integer doInBackground() throws Exception {
         // Do a time-consuming task.
+
         xboxInterface = new inputControl();
         xboxInterface.controllerControl();
         return null;

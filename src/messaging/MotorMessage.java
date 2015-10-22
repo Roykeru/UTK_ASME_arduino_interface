@@ -14,7 +14,8 @@ public class MotorMessage implements IMessage {
         RIGHT_FRONT_DRIVE_MOTOR(2),
         RIGHT_BACK_DRIVE_MOTOR(3),
         LIFTER_MOTOR(4),
-        HOPPER_MOTOR(5);
+        HOPPER_MOTOR(5),
+        SERVO_MOTOR(6);
 
         private static Map<Integer, Motor> map = new HashMap<Integer, Motor>();
 
