@@ -23,12 +23,13 @@ public class inputControl {
         double yrotation = 0;
         double aux_flipper_val = .6;
         boolean isKilled = false;
+        boolean combineIsOn = false;
 
         Controller[] ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
         Controller xboxController = null;
 
         for (int i = 0; i < ca.length && xboxController == null; i++) {
-            //System.out.println(ca[i].getName());
+            System.out.println(ca[i].getName());
             if (ca[i].getName().equals("XBOX 360 For Windows (Controller)") || ca[i].getName().equals("Controller (XBOX 360 For Windows)")) {
                 xboxController = ca[i];
                 System.out.println(xboxController.getName());
@@ -132,6 +133,21 @@ public class inputControl {
                         }
                         break;
 
+                    case "Button 9":
+                        if (value == 1.0f && !combineIsOn){
+                            writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
+                            combineIsOn = true;
+                        }
+                        else if(value == 1.0f && combineIsOn){
+                            writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
+                            combineIsOn = false;
+                        }
+                        else{
+                            continue;
+                        }
+
+                        break;
+
                     case "X Axis":
                     /*
                         xaxis = value;
@@ -148,15 +164,14 @@ public class inputControl {
 
                     case "Y Axis":
                         yaxis = value;
-                        if (yaxis > .1 || yaxis < -.1)  {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, 1 * yaxis));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR,
-                                    1 * yaxis));
-                            //System.out.println(String.format("left stick throttleLeft is %1$s and direction is %2$s", throttleLeft, leftDirection));
+                        if (yaxis > .15 || yaxis < -.15)  {
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, -Math.copySign(1, yaxis) * Math.pow(10, Math.abs(yaxis)) * .1));
+                            //writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 1 * yaxis));
+                            //System.out.println(String.format("left stick throttleLeft is %1$s", -Math.copySign(1, yaxis) * Math.pow(10,Math.abs(yaxis)) * .1));
                         }
                         else{
                             writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_BACK_DRIVE_MOTOR, 0));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
+                            //writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
                         }
                         break;
 
@@ -177,14 +192,14 @@ public class inputControl {
 
                     case "Y Rotation":
                         yrotation = value;
-                        if (yrotation > .1 || yrotation < -.1){
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR, -1 * yrotation));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -1 * yrotation));
+                        if (yrotation > .15 || yrotation < -.15){
+                            //writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR, -1 * yrotation));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yrotation) * Math.pow(10, Math.abs(yrotation)) * .1 ));
                             //System.out.println(String.format("right stick throttleLeft is %1$s and direction is %2$s", throttleRight, rightDirection));
 
                         }
                         else{
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR, 0));
+                            //writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_BACK_DRIVE_MOTOR, 0));
                             writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
                         }
                         break;
