@@ -44,7 +44,7 @@ public class serialTest implements SerialPortEventListener {
             CommPortIdentifier curPort = (CommPortIdentifier)ports.nextElement();
             
             if (curPort.getPortType() == CommPortIdentifier.PORT_SERIAL){
-                System.out.println(curPort.getName());
+                //System.out.println(curPort.getName());
                 portList.add(curPort.getName());
             }
         }

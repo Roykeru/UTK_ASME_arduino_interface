@@ -5,6 +5,7 @@
  */
 
 import messaging.*;
+import net.java.games.input.Controller;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,8 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class GraphicsInterface extends JFrame {
@@ -19,23 +22,27 @@ public class GraphicsInterface extends JFrame {
     final serialTest engage = new serialTest();
     final MessageReader messageReader = new MessageReader();
     // final xboxControllerTest connectController = new xboxControllerTest();
-    private JComboBox commPorts;
+    private JComboBox commPorts, controllerPorts;
     private JTextArea console;
     private JButton initialize, refresh;
     private JLabel batteryVoltage, limitSwitchZero, limitSwitchOne, encoderLeftFront,
             encoderLeftRear,encoderRightFront,encoderRightRear;
     private String[] portList = {};
     private boolean isConnected = false;
-    private double voltage;
+    private double voltage = 0;
+    private byte firstInit = 0;
     private boolean canceldashboard = false;
     SerialWorker initiateController;
+    inputControl xboxController;
+    Controller[] allControllers;
+    Controller control;
+    private List<String> allTheControllers = new ArrayList<String>();
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
 
 
     public GraphicsInterface(){
-        voltage = 0;
         createGraphicInterface();
         updateDashboard();
         canceldashboard = true;
@@ -44,9 +51,9 @@ public class GraphicsInterface extends JFrame {
     public void createGraphicInterface(){
         Container GraphicsInterfacePane = getContentPane();
         GraphicsInterfacePane.setLayout(null);
+
         engage.searchForPorts();
         redirectSystemStreams();
-
 
         console = new JTextArea();
         JScrollPane scrollPane = new JScrollPane(console,
@@ -61,13 +68,21 @@ public class GraphicsInterface extends JFrame {
         GraphicsInterfacePane.add(scrollPane);
         //GraphicsInterfacePane.add(console);
 
-
+        searchForControllers();
 
         commPorts = new JComboBox(engage.getPorts().toArray());
         commPorts.setLocation(350,50);
         commPorts.setSize(100,30);
         //commPorts.setSelectedIndex(0);
         GraphicsInterfacePane.add(commPorts);
+
+        controllerPorts = new JComboBox();
+        controllerPorts.setLocation(500,50);
+        controllerPorts.setSize(200, 30);
+        GraphicsInterfacePane.add(controllerPorts);
+        for( int i = 0;i < allTheControllers.size(); i++){
+            controllerPorts.addItem(allTheControllers.get(i));
+        }
 
         initialize = new JButton();
         initialize.setText("Initialize");
@@ -82,7 +97,7 @@ public class GraphicsInterface extends JFrame {
                             engage.setPortname(commPorts.getSelectedItem().toString());
                             engage.initialize();
                             engage.portConnect();
-                            initiateController = new SerialWorker();
+                            initiateController = new SerialWorker(control);
                             initiateController.execute();
                             initialize.setText("Disconnect");
                             isConnected = true;
@@ -117,6 +132,15 @@ public class GraphicsInterface extends JFrame {
                             commPorts.removeAllItems();
                             for (int i = 0; i < engage.getPorts().size(); i++){
                                 commPorts.addItem(engage.getPorts().get(i));
+                            }
+
+                            xboxController = new inputControl();
+                            xboxController.getControllers();
+                            allControllers = xboxController.getName();
+                            commPorts.removeAllItems();
+                            for (int i = 0; i < xboxController.getName().length; i++){
+                                Controller[] temp = xboxController.getName();
+                                allTheControllers.add(temp[i].toString());
                             }
                         }
                     }
@@ -170,6 +194,7 @@ public class GraphicsInterface extends JFrame {
         setSize(800,600);
         setVisible(true);
     }
+
     private void updateTextArea(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -270,7 +295,17 @@ public class GraphicsInterface extends JFrame {
         };
 
         System.setOut(new PrintStream(out, true));
-        //System.setErr(new PrintStream(out, true));
+        System.setErr(new PrintStream(out, true));
+    }
+
+    private void searchForControllers(){
+        xboxController = new inputControl();
+        xboxController.getControllers();
+        allControllers = xboxController.getName();
+        for (int i = 0; i < xboxController.getName().length; i++){
+            Controller[] temp = xboxController.getName();
+            allTheControllers.add(temp[i].toString());
+        }
     }
 
     public static void main(String[] args){

@@ -9,14 +9,44 @@ import messaging.IMessage;
 import messaging.MotorMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class inputControl {
 
     private boolean isRunning = true;
+    private List<String> availableControllers = new ArrayList<String>();
+    Controller[] ca;
+    Controller xboxController;
 
+    public inputControl(){
+        ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
+        xboxController = null;
+    }
 
-    public void controllerControl(){
+    public void getControllers(){
+        for (int i = 0; i < ca.length; i++) {
+            //System.out.println(ca[i].getName());
+            if (ca[i].getName().equals("XBOX 360 For Windows (Controller)") || ca[i].getName().equals("Controller (XBOX 360 For Windows)")) {
+                xboxController = ca[i];
+                //System.out.println(xboxController.getName());
+            return;
+            }
+        }
 
+        if (xboxController == null){
+            System.out.println("No Xbox 360 controller found");
+
+        }
+    }
+
+    public Controller[] getName(){
+        return ca;
+    }
+
+    public void controllerControl(Controller controller){
+
+        xboxController = controller;
         double xaxis = 0;
         double yaxis = 0;
         double xrotation = 0;
@@ -24,9 +54,6 @@ public class inputControl {
         double aux_flipper_val = .6;
         boolean isKilled = false;
         boolean combineIsOn = false;
-
-        Controller[] ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
-        Controller xboxController = null;
 
         for (int i = 0; i < ca.length && xboxController == null; i++) {
             System.out.println(ca[i].getName());
