@@ -222,13 +222,6 @@ public class serialTest implements SerialPortEventListener {
     }
     //main method
 
-    public static void main(String[] args) {
-        /*serialTest main = new serialTest();
-        main.searchForPorts();
-        main.initialize();
-        main.portConnect();*/
-
-    }
 //end of main method
 // end of  SerialTest class
 }

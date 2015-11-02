@@ -4,11 +4,13 @@
  * Created by Michael Haines on 1/1/2015.
  */
 
+import com.sun.prism.*;
 import messaging.*;
 import net.java.games.input.Controller;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Graphics;
 import java.awt.event.*;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,7 +42,6 @@ public class GraphicsInterface extends JFrame {
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
-
 
     public GraphicsInterface(){
         createGraphicInterface();
@@ -310,6 +311,6 @@ public class GraphicsInterface extends JFrame {
 
     public static void main(String[] args){
         GraphicsInterface graphics = new GraphicsInterface();
-        graphics.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        graphics.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }

@@ -2,7 +2,7 @@
 /**
  * Created by Michael Haines on 12/28/2014.
  */
-import ch.aplu.xboxcontroller.*;
+//import ch.aplu.xboxcontroller.*;
 import messaging.IMessage;
 import messaging.MotorMessage;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class xboxControllerTest {
 
-    XboxController xc;
+    /*XboxController xc;
     private double throttleLeft = 0;
     private double throttleRight = 0;
     private double throttleHopper = 0;
@@ -82,7 +82,7 @@ public class xboxControllerTest {
                 "RumbleDemo V1.0 (www.aplu.ch)",
                 JOptionPane.PLAIN_MESSAGE);*/
 
-
+/*
     }
 
     public void writeMessage(IMessage msg){
@@ -102,8 +102,8 @@ public class xboxControllerTest {
             InputStreamReader Ir = new InputStreamReader(System.in);
             BufferedReader Br = new BufferedReader(Ir);
         } catch (Exception e) {
-        }*/
+        }
 
 
-    }
+    }*/
 }

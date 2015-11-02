@@ -1,10 +1,9 @@
-import messaging.KillMessage;
-import net.java.games.input.*;
-
 /**
  * Created by USER on 7/12/2015.
  */
 
+import messaging.KillMessage;
+import net.java.games.input.*;
 import messaging.IMessage;
 import messaging.MotorMessage;
 
@@ -163,10 +162,12 @@ public class inputControl {
                     case "Button 9":
                         if (value == 1.0f && !combineIsOn){
                             writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
+                            System.out.println("Yay");
                             combineIsOn = true;
                         }
                         else if(value == 1.0f && combineIsOn){
                             writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
+                            System.out.println("Wooo");
                             combineIsOn = false;
                         }
                         else{
@@ -232,7 +233,7 @@ public class inputControl {
                         break;
 
                     case "Z Axis":
-                        //System.out.println(String.format("Z Axis Magnitude is %s", value));
+                        System.out.println(String.format("Z Axis Magnitude is %s", value));
                         writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, -1 * value));
                         break;
 
@@ -260,6 +261,6 @@ public class inputControl {
         this.isRunning = isRunning;
     }
 
-    public static void main(String[] args){
-    }
+    /*public static void main(String[] args){
+    }*/
 }
