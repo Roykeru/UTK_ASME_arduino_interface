@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.Graphics;
 import java.awt.event.*;
+import java.beans.Encoder;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -39,6 +40,7 @@ public class GraphicsInterface extends JFrame {
     Controller[] allControllers;
     Controller control;
     private List<String> allTheControllers = new ArrayList<String>();
+    int[] controllerLocation = new int[10];
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -50,8 +52,28 @@ public class GraphicsInterface extends JFrame {
     }
 
     public void createGraphicInterface(){
+
+        try {
+            // Set System L&F
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (UnsupportedLookAndFeelException e) {
+            // handle exception
+        }
+        catch (ClassNotFoundException e) {
+            // handle exception
+        }
+        catch (InstantiationException e) {
+            // handle exception
+        }
+        catch (IllegalAccessException e) {
+            // handle exception
+        }
+
         Container GraphicsInterfacePane = getContentPane();
         GraphicsInterfacePane.setLayout(null);
+
 
         engage.searchForPorts();
         redirectSystemStreams();
@@ -61,6 +83,7 @@ public class GraphicsInterface extends JFrame {
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         //console.setWrapStyleWord(true);
         console.setEditable(false);
+        console.setForeground(Color.BLUE);
         //console.setRows(80);
         //console.setColumns(60);
         scrollPane.setSize(700,250);
@@ -81,8 +104,8 @@ public class GraphicsInterface extends JFrame {
         controllerPorts.setLocation(500,50);
         controllerPorts.setSize(200, 30);
         GraphicsInterfacePane.add(controllerPorts);
-        for( int i = 0;i < allTheControllers.size(); i++){
-            controllerPorts.addItem(allTheControllers.get(i));
+        for (String allTheController : allTheControllers) {
+            controllerPorts.addItem(allTheController);
         }
 
         initialize = new JButton();
@@ -98,8 +121,12 @@ public class GraphicsInterface extends JFrame {
                             engage.setPortname(commPorts.getSelectedItem().toString());
                             engage.initialize();
                             engage.portConnect();
+
+                            control = allControllers[controllerLocation[controllerPorts.getSelectedIndex()]];
+                            System.out.println(control);
                             initiateController = new SerialWorker(control);
                             initiateController.execute();
+                            
                             initialize.setText("Disconnect");
                             isConnected = true;
                             canceldashboard = false;
@@ -135,14 +162,12 @@ public class GraphicsInterface extends JFrame {
                                 commPorts.addItem(engage.getPorts().get(i));
                             }
 
-                            xboxController = new inputControl();
-                            xboxController.getControllers();
-                            allControllers = xboxController.getName();
-                            commPorts.removeAllItems();
-                            for (int i = 0; i < xboxController.getName().length; i++){
-                                Controller[] temp = xboxController.getName();
-                                allTheControllers.add(temp[i].toString());
+                            controllerPorts.removeAllItems();
+                            searchForControllers();
+                            for (String allTheController : allTheControllers) {
+                                controllerPorts.addItem(allTheController);
                             }
+
                         }
                     }
                 }
@@ -255,7 +280,6 @@ public class GraphicsInterface extends JFrame {
                             else if(((EncoderMessage)msg).getEncoderMessageId() == 3){
                                 encoderRightRear.setText((String.format("Front Left RPM: %s", combined)));
                             }
-
                         }
                     }
                 }
@@ -301,15 +325,25 @@ public class GraphicsInterface extends JFrame {
 
     private void searchForControllers(){
         xboxController = new inputControl();
-        xboxController.getControllers();
+        allTheControllers.clear();
         allControllers = xboxController.getName();
+        byte a = 0;
         for (int i = 0; i < xboxController.getName().length; i++){
             Controller[] temp = xboxController.getName();
-            allTheControllers.add(temp[i].toString());
+            if (!temp[i].toString().toLowerCase().contains("mouse") &&
+                    !temp[i].toString().toLowerCase().contains("keyboard") &&
+                    !temp[i].toString().toLowerCase().contains("receiver")) {
+                allTheControllers.add(temp[i].toString());
+                controllerLocation[a] = i;
+                a++;
+
+            }
         }
     }
 
     public static void main(String[] args){
+
+
         GraphicsInterface graphics = new GraphicsInterface();
         graphics.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }

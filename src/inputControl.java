@@ -21,21 +21,17 @@ public class inputControl {
     public inputControl(){
         ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
         xboxController = null;
-    }
-
-    public void getControllers(){
-        for (int i = 0; i < ca.length; i++) {
+        for (Controller aCa : ca) {
             //System.out.println(ca[i].getName());
-            if (ca[i].getName().equals("XBOX 360 For Windows (Controller)") || ca[i].getName().equals("Controller (XBOX 360 For Windows)")) {
-                xboxController = ca[i];
+            if (aCa.getName().equals("XBOX 360 For Windows (Controller)") || aCa.getName().equals("Controller (XBOX 360 For Windows)")) {
+                xboxController = aCa;
                 //System.out.println(xboxController.getName());
-            return;
+                break;
             }
         }
 
         if (xboxController == null){
-            System.out.println("No Xbox 360 controller found");
-
+            System.out.println("no xbox controller found");
         }
     }
 
@@ -54,29 +50,11 @@ public class inputControl {
         boolean isKilled = false;
         boolean combineIsOn = false;
 
-        for (int i = 0; i < ca.length && xboxController == null; i++) {
-            System.out.println(ca[i].getName());
-            if (ca[i].getName().equals("XBOX 360 For Windows (Controller)") || ca[i].getName().equals("Controller (XBOX 360 For Windows)")) {
-                xboxController = ca[i];
-                System.out.println(xboxController.getName());
-            }
-        }
-
-        if (xboxController == null){
-            System.out.print("No Xbox 360 controller found");
-            return;
-        }
-
         while(isRunning) {
             xboxController.poll();
             EventQueue queue = xboxController.getEventQueue();
             Event event = new Event();
             while(queue.getNextEvent(event)) {
-                StringBuffer buffer = new StringBuffer(xboxController.getName());
-                buffer.append(" at ");
-                buffer.append(event.getNanos()).append(", ");
-                Component comp = event.getComponent();
-                buffer.append(comp.getName()).append(" changed to ");
                 float value = event.getValue();
                 switch (event.getComponent().toString()) {
                     case "Button 7":
@@ -99,9 +77,10 @@ public class inputControl {
                     case "Button 0":
                         if (value == 1.0f) {
                             writeMessage(new MotorMessage(MotorMessage.Motor.SERVO_MOTOR, 1));
-                           //System.out.println("B Button On");
+                            //System.err.println("B Button On");
                         } else {
                             //System.out.println("B Button Off");
+                            continue;
                         }
                         break;
 
@@ -112,6 +91,7 @@ public class inputControl {
 
                         } else {
                             //System.out.println("B Button Off");
+                            continue;
                         }
                         break;
 
