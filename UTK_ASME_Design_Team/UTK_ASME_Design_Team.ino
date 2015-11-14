@@ -6,9 +6,7 @@
 
 Servo mainFlippers;
 Servo auxFlippers;
-Servo rightBackMotor;
 Servo rightFrontMotor;
-Servo leftBackMotor;
 Servo leftFrontMotor;
 Servo servoMotor;
 Servo combineMotor;
@@ -54,12 +52,13 @@ void process_message(struct message_t *message) {
 			
 		case 'k':
 			leftFrontMotor.writeMicroseconds(1500);
-			leftBackMotor.writeMicroseconds(1500);
 			rightFrontMotor.writeMicroseconds(1500);
-			rightBackMotor.writeMicroseconds(1500);
 			mainFlippers.writeMicroseconds(1500);
 			auxFlippers.writeMicroseconds(1500);
+			combineMotor.writeMicroseconds(1500);
+			servoMotor.writeMicroseconds(1500);
 			break;
+			
 		default:
 			message_processed(message);
 			break;
@@ -85,36 +84,29 @@ byte process_motor_message(struct motor_message_t *motor_message, byte size) {
 
 	switch (motor_number){
 		case 0:
-			//leftFrontMotor.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
+			leftFrontMotor.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
 			break;
 			
 		case 1:
-			leftBackMotor.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
-			break;
-			
-		case 2:
 			rightFrontMotor.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
 			break;
 			
-		case 3:
-			//rightBackMotor.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
-			break;
-			
-		case 4:
+		case 2:
 			mainFlippers.writeMicroseconds(1000 + (int)motors[motor_number].value * 5); //30 & 147
 			break;
 			
-		case 5:
+		case 3:
 			auxFlippers.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
 			break;
 			
-		case 6:
+		case 4:
+			combineMotor.writeMicroseconds(1000 + (int)motors[motor_number].value*.5);
+			break;
+			
+		case 5:
 			servoMotor.write((int)motors[motor_number].value * .9);
 			break;
-			 
-		case 7:
-			combineMotor.writeMicroseconds(1000 + (int)motors[motor_number].value*.5);
-			break;			 
+				 
 	}
 
 	return 1;
@@ -128,11 +120,9 @@ void setup(void) {
 	auxFlippers.attach(5); //auxiliary flippers
 	combineMotor.attach(6); // combine
 	rightFrontMotor.attach(9); //Right Drive Motors
-	leftBackMotor.attach(10); //left Drive Motors
+	leftFrontMotor.attach(10); //left Drive Motors
 	servoMotor.attach(11); //Servo
-	//rightBackMotor.attach(6);
-	//leftFrontMotor.attach(11);
-	//pinMode(ledpin, OUTPUT);
+
 }
 
 void loop(void) {

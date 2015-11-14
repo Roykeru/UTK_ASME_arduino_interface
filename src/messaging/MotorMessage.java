@@ -10,13 +10,11 @@ public class MotorMessage implements IMessage {
 
     public enum Motor {
         LEFT_FRONT_DRIVE_MOTOR(0),
-        LEFT_BACK_DRIVE_MOTOR(1),
-        RIGHT_FRONT_DRIVE_MOTOR(2),
-        RIGHT_BACK_DRIVE_MOTOR(3),
-        LIFTER_MOTOR(4),
-        HOPPER_MOTOR(5),
-        SERVO_MOTOR(6),
-        COMBINE_MOTOR(7);
+        RIGHT_FRONT_DRIVE_MOTOR(1),
+        LIFTER_MOTOR(2),
+        HOPPER_MOTOR(3),
+        COMBINE_MOTOR(4),
+        SERVO_MOTOR(5);
 
         private static Map<Integer, Motor> map = new HashMap<Integer, Motor>();
 
