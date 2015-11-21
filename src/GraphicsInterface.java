@@ -27,7 +27,7 @@ public class GraphicsInterface extends JFrame {
     // final xboxControllerTest connectController = new xboxControllerTest();
     private JComboBox commPorts, controllerPorts;
     private JTextArea console;
-    private JButton initialize, refresh;
+    private JButton initialize, refresh, killcontrol;
     private JLabel batteryVoltage, limitSwitchZero, limitSwitchOne, encoderLeftFront,
             encoderLeftRear,encoderRightFront,encoderRightRear;
     private String[] portList = {};
@@ -41,6 +41,7 @@ public class GraphicsInterface extends JFrame {
     Controller control;
     private List<String> allTheControllers = new ArrayList<String>();
     int[] controllerLocation = new int[10];
+    private boolean abuse = false;
 
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
@@ -107,6 +108,29 @@ public class GraphicsInterface extends JFrame {
         for (String allTheController : allTheControllers) {
             controllerPorts.addItem(allTheController);
         }
+
+        killcontrol = new JButton();
+        killcontrol.setText("KILL CONTROLS!!!");
+        killcontrol.setSize(130,50);
+        killcontrol.setLocation(600,150);
+        killcontrol.addActionListener(
+               new ActionListener() {
+                   @Override
+                   public void actionPerformed(ActionEvent e) {
+                       if (!abuse){
+                           abuse = true;
+                           initiateController.kill();
+                           System.out.println("Robot Controls Suspended");
+                       }
+                       else{
+                           abuse = false;
+                           initiateController.enable();
+                           System.out.println("Robot Controls Enabled");
+                       }
+                   }
+               }
+        );
+        GraphicsInterfacePane.add(killcontrol);
 
         initialize = new JButton();
         initialize.setText("Initialize");
@@ -340,7 +364,7 @@ public class GraphicsInterface extends JFrame {
             }
         }
     }
-
+   
     public static void main(String[] args){
 
 

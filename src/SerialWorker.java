@@ -1,3 +1,4 @@
+import messaging.MotorMessage;
 import net.java.games.input.Controller;
 
 import javax.swing.*;
@@ -23,6 +24,12 @@ public class SerialWorker extends SwingWorker<Integer, Integer> {
     }
 
     public void kill(){
+        xboxInterface.writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
+        xboxInterface.writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+        xboxInterface.writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
+        xboxInterface.writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
+        xboxInterface.writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, 0));
+        xboxInterface.writeMessage(new MotorMessage(MotorMessage.Motor.SERVO_MOTOR, 0));
         xboxInterface.setIsRunning(false);
     }
 

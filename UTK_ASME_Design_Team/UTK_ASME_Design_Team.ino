@@ -100,11 +100,11 @@ byte process_motor_message(struct motor_message_t *motor_message, byte size) {
 			break;
 			
 		case 4:
-			combineMotor.writeMicroseconds(1000 + (int)motors[motor_number].value*.5);
+			combineMotor.writeMicroseconds(1000 + (int)motors[motor_number].value * 5);
 			break;
 			
 		case 5:
-			servoMotor.write((int)motors[motor_number].value * .9);
+			servoMotor.write(1000 + (int)motors[motor_number].value * 5);
 			break;
 				 
 	}

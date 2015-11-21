@@ -39,7 +39,7 @@ public class inputControl {
         return ca;
     }
 
-    public void controllerControl(Controller controller){
+    public void controllerControl(Controller controller) {
 
         xboxController = controller;
         double xaxis = 0;
@@ -49,153 +49,168 @@ public class inputControl {
         double aux_flipper_val = .6;
         boolean isKilled = false;
         boolean combineIsOn = false;
+        double powerfactor = 1;
+        boolean guessmode = false;
 
-        while(isRunning) {
-            xboxController.poll();
-            EventQueue queue = xboxController.getEventQueue();
-            Event event = new Event();
-            while(queue.getNextEvent(event)) {
-                float value = event.getValue();
-                switch (event.getComponent().toString()) {
+        //Konami Code Variables
+        byte[] Konamicode;
 
-                    case "Button 0":
-                        if (value == 1.0f) {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
-                            //System.err.println("A Button On");
-                        } else {
-                            //System.out.println("A Button Off");
-                            continue;
-                        }
-                        break;
+        while (true) {
+            while (isRunning) {
+                xboxController.poll();
+                EventQueue queue = xboxController.getEventQueue();
+                Event event = new Event();
+                while (queue.getNextEvent(event)) {
+                    float value = event.getValue();
+                    switch (event.getComponent().toString()) {
 
-
-                    case "Button 1":
-                        if (value == 1.0f) {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, -1));
-                            //System.err.println("B Button On");
-                        } else {
-                            //System.out.println("B Button Off");
-                            continue;
-                        }
-                        break;
-
-                    case "Button 2":
-                        if (value == 1.0f) {
-                            if (aux_flipper_val > 0){
-                                aux_flipper_val -= .2;
+                        case "Button 0":
+                            if (value == 1.0f) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
+                                //System.err.println("A Button On");
+                            } else {
+                                //System.out.println("A Button Off");
+                                continue;
                             }
-                            //System.out.println("X Button On");
-                        } else {
-                            continue;
-                            //System.out.println("X Button Off");
-                        }
-                        break;
+                            break;
 
-                    case "Button 3":
-                        if (value == 1.0f) {
-                            if (aux_flipper_val < 1){
-                                aux_flipper_val += .2;
+
+                        case "Button 1":
+                            if (value == 1.0f) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, -1));
+                                //System.err.println("B Button On");
+                            } else {
+                                //System.out.println("B Button Off");
+                                continue;
                             }
-                            //System.out.println("Y Button On");
-                        } else {
-                            continue;
-                            //System.out.println("Y Button Off");
-                        }
-                        break;
+                            break;
 
-                    case "Button 4":
-                        if (value == 1.0f) {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, -1 * aux_flipper_val));
-                            //System.out.println("Left Bumper On");
-                        } else {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
-                            //System.out.println("Left Bumper Off");
-                        }
-                        break;
-
-                    case "Button 5":
-                        if (value == 1.0f) {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, aux_flipper_val));
-                            //System.out.println("Right Bumper On");
-                        } else {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
-                            //System.out.println("Right Bumper Off");
-                        }
-                        break;
-
-                    case "Button 6":
-                        break;
-
-                    case "Button 7":
-                        if (value == 1.0f) {
-                            if (!isKilled){
-                                writeMessage(new KillMessage(1));
-                                isKilled = true;
+                        case "Button 2":
+                            if (value == 1.0f) {
+                                if (aux_flipper_val > 0) {
+                                    aux_flipper_val -= .2;
+                                }
+                                //System.out.println("X Button On");
+                            } else {
+                                continue;
+                                //System.out.println("X Button Off");
                             }
-                            else{
-                                writeMessage(new KillMessage(0));
-                                isKilled = false;
+                            break;
+
+                        case "Button 3":
+                            if (value == 1.0f) {
+                                if (aux_flipper_val < 1) {
+                                    aux_flipper_val += .2;
+                                }
+                                //System.out.println("Y Button On");
+                            } else {
+                                continue;
+                                //System.out.println("Y Button Off");
+                            }
+                            break;
+
+                        case "Button 4":
+                            if (value == 1.0f) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, -1 * aux_flipper_val));
+                                //System.out.println("Left Bumper On");
+                            } else {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                                //System.out.println("Left Bumper Off");
+                            }
+                            break;
+
+                        case "Button 5":
+                            if (value == 1.0f) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, aux_flipper_val));
+                                //System.out.println("Right Bumper On");
+                            } else {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                                //System.out.println("Right Bumper Off");
+                            }
+                            break;
+
+                        case "Button 6":
+                            if (value == 1.0f) {
+                                if (!guessmode) {
+                                    powerfactor = .7;
+                                    guessmode = true;
+                                    System.out.println("Guest Mode Enabled!");
+                                } else {
+                                    powerfactor = 1;
+                                    guessmode = false;
+                                    System.out.println("Guest Mode Disabled!");
+                                }
+                            } else {
+                                continue;
+                            }
+                            break;
+
+                        case "Button 7":
+                            if (value == 1.0f) {
+
+                                if (!isKilled) {
+                                    writeMessage(new KillMessage(1));
+                                    isKilled = true;
+                                    System.out.println("The robot is dead!");
+                                } else {
+                                    writeMessage(new KillMessage(0));
+                                    isKilled = false;
+                                }
+
+                            } else {
+                                continue;
+                            }
+                            break;
+
+                        case "Button 9":
+                            if (value == 1.0f && !combineIsOn) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
+                                combineIsOn = true;
+                            } else if (value == 1.0f && combineIsOn) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
+                                combineIsOn = false;
+                            } else {
+                                continue;
                             }
 
-                        } else {
-                            continue;
-                        }
-                        break;
+                            break;
 
-                    case "Button 8":
-                        break;
+                        case "Button 10":
+                            break;
 
-                    case "Button 9":
-                        if (value == 1.0f && !combineIsOn){
-                            writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
-                            System.out.println("Yay");
-                            combineIsOn = true;
-                        }
-                        else if(value == 1.0f && combineIsOn){
-                            writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
-                            System.out.println("Wooo");
-                            combineIsOn = false;
-                        }
-                        else{
-                            continue;
-                        }
+                        case "X Axis":
+                            break;
 
-                        break;
+                        case "Y Axis":
+                            yaxis = value;
+                            if (yaxis > .15 || yaxis < -.15) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yaxis) * Math.pow(10, Math.abs(yaxis)) * .1 * powerfactor));
+                                //System.out.println(String.format("left stick throttleLeft is %1$s", -Math.copySign(1, yaxis) * Math.pow(10,Math.abs(yaxis)) * .1));
+                            } else {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
+                            }
+                            break;
 
-                    case "X Axis":
-                        break;
+                        case "X Rotation":
+                            break;
 
-                    case "Y Axis":
-                        yaxis = value;
-                        if (yaxis > .15 || yaxis < -.15)  {
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yaxis) * Math.pow(10, Math.abs(yaxis)) * .1));
-                            //System.out.println(String.format("left stick throttleLeft is %1$s", -Math.copySign(1, yaxis) * Math.pow(10,Math.abs(yaxis)) * .1));
-                        }
-                        else{
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
-                        }
-                        break;
+                        case "Y Rotation":
+                            yrotation = value;
+                            if (yrotation > .15 || yrotation < -.15) {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yrotation) * Math.pow(10, Math.abs(yrotation)) * .1 * powerfactor));
+                                //System.out.println(String.format("right stick throttleLeft is %1$s and direction is %2$s", throttleRight, rightDirection));
 
-                    case "X Rotation":
-                        break;
+                            } else {
+                                writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
+                            }
+                            break;
 
-                    case "Y Rotation":
-                        yrotation = value;
-                        if (yrotation > .15 || yrotation < -.15){
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yrotation) * Math.pow(10, Math.abs(yrotation)) * .1 ));
-                            //System.out.println(String.format("right stick throttleLeft is %1$s and direction is %2$s", throttleRight, rightDirection));
+                        case "Z Axis":
+                            //System.out.println(String.format("Z Axis Magnitude is %s", value));
+                            writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, -powerfactor * value));
+                            break;
 
-                        }
-                        else{
-                            writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
-                        }
-                        break;
-
-                    case "Z Axis":
-                        //System.out.println(String.format("Z Axis Magnitude is %s", value));
-                        writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, -1 * value));
-                        break;
-
+                    }
                 }
             }
         }
@@ -218,6 +233,7 @@ public class inputControl {
 
     public void setIsRunning(boolean isRunning){
         this.isRunning = isRunning;
+
     }
 
     /*public static void main(String[] args){
