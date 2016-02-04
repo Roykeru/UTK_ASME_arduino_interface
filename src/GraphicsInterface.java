@@ -262,12 +262,15 @@ public class GraphicsInterface extends JFrame {
             public void run() {
                 if(canceldashboard) {
                     try {
+                        System.out.println("sleeping");
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
                 else {
+                    writeMessage(new PingMessage(1));
+                    System.out.println("Java Ping");
                     if (messageReader.messageReady()) {
                         byte[] data = messageReader.getMessage();
                         IMessage msg = MessageParser.parse(data);
@@ -286,6 +289,7 @@ public class GraphicsInterface extends JFrame {
                                         ((LimitSwitchMessage) msg).getIsPressed())));
                             }
                         }
+
                         if (msg instanceof EncoderMessage){
 
                             byte MSB = ((EncoderMessage)msg).getMostSignificantBit();
@@ -364,7 +368,22 @@ public class GraphicsInterface extends JFrame {
             }
         }
     }
-   
+
+    public void writeMessage(IMessage msg){
+        try {
+            byte[] test = msg.getBytes();
+            for(int i = 0; i < msg.getBytes().length; i++){
+                int positive = test[i] & 0xff;
+                //System.out.print(positive);
+                //System.out.print(' ');
+            }
+            //System.out.println(' ');
+            serialTest.output.write(msg.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args){
 
 

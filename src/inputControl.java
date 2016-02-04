@@ -166,9 +166,11 @@ public class inputControl {
                             if (value == 1.0f && !combineIsOn) {
                                 writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
                                 combineIsOn = true;
+                                System.out.println("Combine is On");
                             } else if (value == 1.0f && combineIsOn) {
                                 writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
                                 combineIsOn = false;
+                                System.out.println("Combine is Off");
                             } else {
                                 continue;
                             }

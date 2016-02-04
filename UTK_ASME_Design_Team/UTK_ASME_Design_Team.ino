@@ -12,6 +12,8 @@ Servo servoMotor;
 Servo combineMotor;
 
 const int ledpin = 13;
+const int timeout = 15000;
+int lasttime = 0;
 
 struct motor_t {
 	byte value;
@@ -60,6 +62,7 @@ void process_message(struct message_t *message) {
 			break;
 			
 		default:
+			Serial.println("ping");
 			message_processed(message);
 			break;
 	}
@@ -125,10 +128,23 @@ void setup(void) {
 
 }
 
-void loop(void) {
+void loop(void){ 
+	
 	if (read_message(&message)) {
 		process_message(&message);
 		//Serial.println("looping");
+		lasttime = millis();
 	}
-
+	
+	/*if (millis() - timeout < lasttime){
+		leftFrontMotor.writeMicroseconds(1500);
+		rightFrontMotor.writeMicroseconds(1500);
+		mainFlippers.writeMicroseconds(1500);
+		auxFlippers.writeMicroseconds(1500);
+		combineMotor.writeMicroseconds(1500);
+		servoMotor.writeMicroseconds(1500);
+		Serial.println("Lost Signal");
+		lasttime = millis();
+	}*/
+	
 }
