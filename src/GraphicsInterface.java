@@ -262,7 +262,7 @@ public class GraphicsInterface extends JFrame {
             public void run() {
                 if(canceldashboard) {
                     try {
-                        System.out.println("sleeping");
+                        //System.out.println("sleeping");
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
@@ -270,8 +270,8 @@ public class GraphicsInterface extends JFrame {
                 }
                 else {
                     writeMessage(new PingMessage(1));
-                    System.out.println("Java Ping");
-                    if (messageReader.messageReady()) {
+                    //System.out.println("Java Ping");
+                    /*if (messageReader.messageReady()) {
                         byte[] data = messageReader.getMessage();
                         IMessage msg = MessageParser.parse(data);
 
@@ -309,14 +309,14 @@ public class GraphicsInterface extends JFrame {
                                 encoderRightRear.setText((String.format("Front Left RPM: %s", combined)));
                             }
                         }
-                    }
+                    }*/
                 }
             }
 
         };
 
         final ScheduledFuture<?> dashboardUpdater =
-                scheduler.scheduleAtFixedRate(dashboardUpdate, 20 , 20, TimeUnit.MILLISECONDS);
+                scheduler.scheduleAtFixedRate(dashboardUpdate, 200 , 200, TimeUnit.MILLISECONDS);
 
         /*if(canceldashboard) {
             scheduler.schedule(new Runnable() {
