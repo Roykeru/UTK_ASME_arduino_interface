@@ -13,7 +13,7 @@ Servo combineMotor;
 
 const int ledpin = 13;
 const int timeout = 500;
-int lasttime = 0;
+uint32_t lasttime = 0;
 byte haslostsignal = 0;
 
 struct motor_t {
@@ -29,6 +29,7 @@ struct motor_message_t {
 
 //byte process_kill_message(
 byte process_motor_message(struct motor_message_t*, byte);
+byte process_ping_message();
 void process_message(struct message_t *);
 
 void process_message(struct message_t *message) {
@@ -63,7 +64,10 @@ void process_message(struct message_t *message) {
 			break;
 			
 		case 'p':
-			if(process_ping_message());
+			if(process_ping_message()){
+				message_processed(message);
+			}
+			break;
 		default:
 			message_processed(message);
 			break;
@@ -72,6 +76,7 @@ void process_message(struct message_t *message) {
 
 byte process_ping_message(){
 	lasttime = millis();
+	//Serial.println("Ping");
 	return 1;
 	
 }
@@ -79,7 +84,7 @@ byte process_ping_message(){
 byte process_motor_message(struct motor_message_t *motor_message, byte size) {
 	byte motor_number = motor_message->motor_number;
 
-	//Serial.print(motor_number);
+	//Serial.println(motor_number);
 	//Serial.print(" ");
 	
 	if (!(0 <= motor_number && motor_number < NUM_MOTORS)) {
@@ -115,7 +120,8 @@ byte process_motor_message(struct motor_message_t *motor_message, byte size) {
 			break;
 				 
 	}
-
+	
+	lasttime = millis();
 	return 1;
 }
 
@@ -129,19 +135,20 @@ void setup(void) {
 	rightFrontMotor.attach(9); //Right Drive Motors
 	leftFrontMotor.attach(10); //left Drive Motors
 	servoMotor.attach(11); //Servo
-
+	//lasttime = millis();
 }
 
 void loop(void){ 
 	
 	if (read_message(&message)) {
 		process_message(&message);
+		haslostsignal = 0;
 	}
 	
-	if (millis() - timeout < lasttime){
+	if (millis() - timeout > lasttime){
 		if (!haslostsignal){
-			Serial.println("Lost Signal");
-			haslostsignal++;
+			Serial.println("lost signal");
+			haslostsignal = 1;
 		}
 		leftFrontMotor.writeMicroseconds(1500);
 		rightFrontMotor.writeMicroseconds(1500);
