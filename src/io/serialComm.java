@@ -1,30 +1,23 @@
+package io;
 
-import java.io.BufferedReader;                    //BufferedReader makes reading operation efficient
-import java.io.InputStreamReader;         //InputStreamReader decodes a stream of bytes into a character set
-import java.io.OutputStream;          //writes stream of bytes into serial port
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;            //deals with possible events in serial port (eg: data received)
-import gnu.io.SerialPortEventListener; //listens to the a possible event on serial port and notifies when it does
+import gnu.io.*;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import gnu.io.PortInUseException;           //all the exceptions.Never mind them for now
-import java.io.IOException;
-import gnu.io.UnsupportedCommOperationException;
-
-import javax.print.DocFlavor;
-import java.util.TooManyListenersException;
-import java.util.Scanner;                                   //to get user input of name
-import java.util.*;
+import java.util.List;
+import java.util.Scanner;
 
 
-public class serialTest implements SerialPortEventListener {
+public class serialComm implements SerialPortEventListener {
 
     private SerialPort serialPort ;         //defining serial port object
     private Enumeration ports = null;
     private CommPortIdentifier portId  = null;       //my COM port
     private static final int TIME_OUT = 2000;    //time in milliseconds
     private static final int BAUD_RATE = 115200; //baud rate to 9600bps
-    public static BufferedReader input;               //declaring my input buffer
+    public static InputStream input;               //declaring my input buffer
     public static OutputStream output;                //declaring output stream
     private String name;        //user input name string
     Scanner inputName;          //user input name
@@ -47,9 +40,12 @@ public class serialTest implements SerialPortEventListener {
                 //System.out.println(curPort.getName());
                 portList.add(curPort.getName());
             }
+
         }
+        portList.add("/dev/ttyACM0");
     }
     public void initialize(){
+        //portname = "/dev/ttyACM0";
         CommPortIdentifier ports = null;      //to browse through each port identified
         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers(); //store all available ports
         while(portEnum.hasMoreElements()){  //browse through available ports
@@ -96,7 +92,7 @@ public class serialTest implements SerialPortEventListener {
             System.exit(1);
         }
         catch(NullPointerException e2){
-            System.out.println("COM port maybe disconnected");
+            System.out.println("COM port may be disconnected");
         }
         catch(UnsupportedCommOperationException e3){
             System.out.println(e3.toString());
@@ -105,12 +101,13 @@ public class serialTest implements SerialPortEventListener {
         //input and output channels
         try{
             //defining reader and output stream
-            input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
+            //input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
+            input =  serialPort.getInputStream();
             output =  serialPort.getOutputStream();
             char ch = 1; // I added this
             output.write(ch);// and this
             //adding listeners to input and output streams
-            serialPort.addEventListener(this);
+            //serialPort.addEventListener(this);
             serialPort.notifyOnDataAvailable(true);
             serialPort.notifyOnOutputEmpty(true);
         }
@@ -138,63 +135,6 @@ public class serialTest implements SerialPortEventListener {
     }
     //end of serialEvent method
 
-    public synchronized byte[] readBytes() {
-        byte[] byteArray = null;
-        try {
-            ArrayList<Byte> list = new ArrayList<Byte>();
-            while (input.ready()) {
-                list.add((byte) input.read());
-            }
-            byteArray = new byte[list.size()];
-            for (int i = 0; i < byteArray.length; i++) {
-                byteArray[i] = list.get(i);
-            }
-            //System.out.println(list);
-            input.reset();
-        } catch (IOException ex) {
-            System.err.println("Could not read data");
-            ex.printStackTrace();
-        }
-        return byteArray;
-    }
-    public synchronized String[] readLines() {
-        String[] lineArray = null;
-        try {
-            ArrayList<String> list = new ArrayList<String>();
-            while (input.ready()) {
-                list.add(input.readLine());
-            }
-            lineArray = new String[list.size()];
-            for (int i = 0; i < lineArray.length; i++) {
-                lineArray[i] = list.get(i);
-            }
-            //System.out.println(list);
-            input.reset();
-        } catch (IOException ex) {
-            System.err.println("Could not read data");
-            ex.printStackTrace();
-        }
-        return lineArray;
-    }
-
-    public static synchronized void writeData(byte[] data) {
-        System.out.println("Sent: " + data);
-        try {
-            output.write(data);
-            output.flush();
-        } catch (Exception e) {
-            System.out.println("could not write to port");
-        }
-    }
-
-    public synchronized void sendLine(String line) {
-        writeData(line.getBytes());
-    }
-    public synchronized void sendLines(String[] lines) {
-        for (String s : lines) {
-            sendLine(s);
-        }
-    }
 
     //closePort method
     public synchronized void close(){
@@ -205,12 +145,12 @@ public class serialTest implements SerialPortEventListener {
         output = null;
     }
 
-    public void setInput(BufferedReader input){
-        this.input = input;
+    public InputStream getInput(){
+        return input;
     }
 
-    public void setOutput(OutputStream output){
-        this.output = output;
+    public OutputStream getOutput(){
+        return output;
     }
     public void setPortname(String portname){
         this.portname = portname;

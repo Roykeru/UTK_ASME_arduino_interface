@@ -4,15 +4,16 @@
  * Created by Michael Haines on 1/1/2015.
  */
 
-import com.sun.prism.*;
+import io.MessageReader;
+import io.MessageWriter;
+import io.inputControl;
+import io.serialComm;
 import messaging.*;
 import net.java.games.input.Controller;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Graphics;
 import java.awt.event.*;
-import java.beans.Encoder;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -22,8 +23,11 @@ import java.util.concurrent.*;
 
 public class GraphicsInterface extends JFrame {
 
-    final serialTest engage = new serialTest();
-    final MessageReader messageReader = new MessageReader();
+    //final serialComm comm = new serialComm();
+    // final MessageReader messageReader = new MessageReader();
+    private serialComm comm;
+    private MessageReader messageReader;
+    private MessageWriter messageWriter;
     // final xboxControllerTest connectController = new xboxControllerTest();
     private JComboBox commPorts, controllerPorts;
     private JTextArea console;
@@ -47,6 +51,7 @@ public class GraphicsInterface extends JFrame {
             Executors.newScheduledThreadPool(1);
 
     public GraphicsInterface(){
+        comm = new serialComm();
         createGraphicInterface();
         updateDashboard();
         canceldashboard = true;
@@ -76,7 +81,7 @@ public class GraphicsInterface extends JFrame {
         GraphicsInterfacePane.setLayout(null);
 
 
-        engage.searchForPorts();
+        comm.searchForPorts();
         redirectSystemStreams();
 
         console = new JTextArea();
@@ -95,7 +100,7 @@ public class GraphicsInterface extends JFrame {
 
         searchForControllers();
 
-        commPorts = new JComboBox(engage.getPorts().toArray());
+        commPorts = new JComboBox(comm.getPorts().toArray());
         commPorts.setLocation(350,50);
         commPorts.setSize(100,30);
         //commPorts.setSelectedIndex(0);
@@ -142,9 +147,19 @@ public class GraphicsInterface extends JFrame {
                     public void actionPerformed(ActionEvent e) {
 
                         if(!isConnected) {
-                            engage.setPortname(commPorts.getSelectedItem().toString());
-                            engage.initialize();
-                            engage.portConnect();
+                            comm.setPortname(commPorts.getSelectedItem().toString());
+                            comm.initialize();
+                            comm.portConnect();
+
+                            messageReader = new MessageReader(comm.getInput());
+                            (new Thread (messageReader)).start();
+                            messageWriter = new MessageWriter(comm.getOutput());
+                            (new Thread (messageWriter)).start();
+
+                            messageReader.setClose(false);
+                            messageWriter.setClose(false);
+
+                            messageWriter.writeMessage(new PingMessage(1));
 
                             control = allControllers[controllerLocation[controllerPorts.getSelectedIndex()]];
                             System.out.println(control);
@@ -158,9 +173,13 @@ public class GraphicsInterface extends JFrame {
 
                         }
                         else if (isConnected && initiateController != null) {
+                            messageWriter.writeMessage(new PingMessage(0));
+                            messageReader.setClose(true);
+                            messageWriter.setClose(true);
+
                             canceldashboard = true;
                             initiateController.kill();
-                            engage.close();
+                            comm.close();
                             initialize.setText("initialize");
                             //scheduler.shutdown();
                             isConnected = false;
@@ -180,10 +199,10 @@ public class GraphicsInterface extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         if (initialize.getText().equals("Initialize")){
-                            engage.searchForPorts();
+                            comm.searchForPorts();
                             commPorts.removeAllItems();
-                            for (int i = 0; i < engage.getPorts().size(); i++){
-                                commPorts.addItem(engage.getPorts().get(i));
+                            for (int i = 0; i < comm.getPorts().size(); i++){
+                                commPorts.addItem(comm.getPorts().get(i));
                             }
 
                             controllerPorts.removeAllItems();
@@ -378,7 +397,7 @@ public class GraphicsInterface extends JFrame {
                 //System.out.print(' ');
             }
             //System.out.println(' ');
-            serialTest.output.write(msg.getBytes());
+            serialComm.output.write(msg.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }

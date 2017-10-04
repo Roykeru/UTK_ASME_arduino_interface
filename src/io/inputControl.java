@@ -1,8 +1,9 @@
-/**
+package io; /**
  * Created by USER on 7/12/2015.
  */
 
 import messaging.KillMessage;
+import io.serialComm;
 import net.java.games.input.*;
 import messaging.IMessage;
 import messaging.MotorMessage;
@@ -122,10 +123,10 @@ public class inputControl {
                         case "Button 5":
                             if (value == 1.0f) {
                                 writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, aux_flipper_val));
-                                //System.out.println("Right Bumper On");
+                                System.out.println("Right Bumper On");
                             } else {
                                 writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
-                                //System.out.println("Right Bumper Off");
+                                System.out.println("Right Bumper Off");
                             }
                             break;
 
@@ -227,7 +228,7 @@ public class inputControl {
                 //System.out.print(' ');
             }
             //System.out.println(' ');
-            serialTest.output.write(msg.getBytes());
+            serialComm.output.write(msg.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
