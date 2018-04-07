@@ -1,4 +1,3 @@
-import io.inputControl;
 import messaging.MotorMessage;
 import net.java.games.input.Controller;
 

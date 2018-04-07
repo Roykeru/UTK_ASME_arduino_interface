@@ -6,7 +6,6 @@
 
 import io.MessageReader;
 import io.MessageWriter;
-import io.inputControl;
 import io.serialComm;
 import messaging.*;
 import net.java.games.input.Controller;
@@ -377,30 +376,14 @@ public class GraphicsInterface extends JFrame {
         byte a = 0;
         for (int i = 0; i < xboxController.getName().length; i++){
             Controller[] temp = xboxController.getName();
-            if (!temp[i].toString().toLowerCase().contains("mouse") &&
-                    !temp[i].toString().toLowerCase().contains("keyboard") &&
-                    !temp[i].toString().toLowerCase().contains("receiver")) {
-                allTheControllers.add(temp[i].toString());
-                controllerLocation[a] = i;
-                a++;
-
-            }
+            allTheControllers.add(temp[i].toString());
+            controllerLocation[a] = i;
+            a++;
         }
     }
 
     public void writeMessage(IMessage msg){
-        try {
-            byte[] test = msg.getBytes();
-            for(int i = 0; i < msg.getBytes().length; i++){
-                int positive = test[i] & 0xff;
-                //System.out.print(positive);
-                //System.out.print(' ');
-            }
-            //System.out.println(' ');
-            serialComm.output.write(msg.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public static void main(String[] args){

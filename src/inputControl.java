@@ -1,9 +1,11 @@
-package io; /**
+/**
  * Created by USER on 7/12/2015.
  */
 
+import io.MessageWriter;
 import messaging.KillMessage;
 import io.serialComm;
+import messaging.PingMessage;
 import net.java.games.input.*;
 import messaging.IMessage;
 import messaging.MotorMessage;
@@ -15,6 +17,7 @@ import java.util.List;
 public class inputControl {
 
     private boolean isRunning = true;
+    private MessageWriter messageWriter;
     private List<String> availableControllers = new ArrayList<String>();
     Controller[] ca;
     Controller xboxController;
@@ -23,8 +26,9 @@ public class inputControl {
         ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
         xboxController = null;
         for (Controller aCa : ca) {
-            //System.out.println(ca[i].getName());
-            if (aCa.getName().equals("XBOX 360 For Windows (Controller)") || aCa.getName().equals("Controller (XBOX 360 For Windows)")) {
+            System.out.println(aCa.getName());
+            if (aCa.getName().equals("XBOX 360 For Windows (Controller)") || aCa.getName().equals("Controller (XBOX 360 For Windows)")
+                    || aCa.getName().equals("Controller (Xbox 360 Wireless Receiver for Windows)")) {
                 xboxController = aCa;
                 //System.out.println(xboxController.getName());
                 break;
@@ -55,6 +59,8 @@ public class inputControl {
 
         //Konami Code Variables
         byte[] Konamicode;
+        MessageWriter messageWriter = new MessageWriter(serialComm.output);
+        (new Thread (messageWriter)).start();
 
         while (true) {
             while (isRunning) {
@@ -67,7 +73,7 @@ public class inputControl {
 
                         case "Button 0":
                             if (value == 1.0f) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
                                 //System.err.println("A Button On");
                             } else {
                                 //System.out.println("A Button Off");
@@ -78,7 +84,7 @@ public class inputControl {
 
                         case "Button 1":
                             if (value == 1.0f) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, -1));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, -1));
                                 //System.err.println("B Button On");
                             } else {
                                 //System.out.println("B Button Off");
@@ -112,20 +118,20 @@ public class inputControl {
 
                         case "Button 4":
                             if (value == 1.0f) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, -1 * aux_flipper_val));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, -1 * aux_flipper_val));
                                 //System.out.println("Left Bumper On");
                             } else {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
                                 //System.out.println("Left Bumper Off");
                             }
                             break;
 
                         case "Button 5":
                             if (value == 1.0f) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, aux_flipper_val));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, aux_flipper_val));
                                 System.out.println("Right Bumper On");
                             } else {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.HOPPER_MOTOR, 0));
                                 System.out.println("Right Bumper Off");
                             }
                             break;
@@ -150,11 +156,11 @@ public class inputControl {
                             if (value == 1.0f) {
 
                                 if (!isKilled) {
-                                    writeMessage(new KillMessage(1));
+                                    messageWriter.writeMessage(new KillMessage(1));
                                     isKilled = true;
                                     System.out.println("The robot is dead!");
                                 } else {
-                                    writeMessage(new KillMessage(0));
+                                    messageWriter.writeMessage(new KillMessage(0));
                                     isKilled = false;
                                 }
 
@@ -165,11 +171,11 @@ public class inputControl {
 
                         case "Button 9":
                             if (value == 1.0f && !combineIsOn) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 1));
                                 combineIsOn = true;
                                 System.out.println("Combine is On");
                             } else if (value == 1.0f && combineIsOn) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.COMBINE_MOTOR, 0));
                                 combineIsOn = false;
                                 System.out.println("Combine is Off");
                             } else {
@@ -187,10 +193,10 @@ public class inputControl {
                         case "Y Axis":
                             yaxis = value;
                             if (yaxis > .15 || yaxis < -.15) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yaxis) * Math.pow(10, Math.abs(yaxis)) * .1 * powerfactor));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yaxis) * Math.pow(10, Math.abs(yaxis)) * .1 * powerfactor));
                                 //System.out.println(String.format("left stick throttleLeft is %1$s", -Math.copySign(1, yaxis) * Math.pow(10,Math.abs(yaxis)) * .1));
                             } else {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.LEFT_FRONT_DRIVE_MOTOR, 0));
                             }
                             break;
 
@@ -200,17 +206,17 @@ public class inputControl {
                         case "Y Rotation":
                             yrotation = value;
                             if (yrotation > .15 || yrotation < -.15) {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yrotation) * Math.pow(10, Math.abs(yrotation)) * .1 * powerfactor));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, -Math.copySign(1, yrotation) * Math.pow(10, Math.abs(yrotation)) * .1 * powerfactor));
                                 //System.out.println(String.format("right stick throttleLeft is %1$s and direction is %2$s", throttleRight, rightDirection));
 
                             } else {
-                                writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
+                                messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.RIGHT_FRONT_DRIVE_MOTOR, 0));
                             }
                             break;
 
                         case "Z Axis":
                             //System.out.println(String.format("Z Axis Magnitude is %s", value));
-                            writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, -powerfactor * value));
+                            messageWriter.writeMessage(new MotorMessage(MotorMessage.Motor.LIFTER_MOTOR, -powerfactor * value));
                             break;
 
                     }
@@ -219,19 +225,8 @@ public class inputControl {
         }
     }
 
-    public void writeMessage(IMessage msg){
-        try {
-            byte[] test = msg.getBytes();
-            for(int i = 0; i < msg.getBytes().length; i++){
-                int positive = test[i] & 0xff;
-                //System.out.print(positive);
-                //System.out.print(' ');
-            }
-            //System.out.println(' ');
-            serialComm.output.write(msg.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void writeMessage(IMessage msg) {
+        messageWriter.writeMessage(msg);
     }
 
     public void setIsRunning(boolean isRunning){

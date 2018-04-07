@@ -3,6 +3,7 @@ package io;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * Created by michael on 8/3/16 and heavily based on Andy's code. Sorry Andy!!!
@@ -24,6 +25,7 @@ public class COBSWriter {
         serialComm.output.write(rawStuff, 0, stuffedOutput.remaining()); //TODO: Fix Encapsulation
         //out.write(rawStuff, 0, stuffedOutput.remaining());
         stuffedOutput.clear();
+        //System.out.println(Arrays.toString(rawStuff));
         //System.out.println("wrote data");
     }
 

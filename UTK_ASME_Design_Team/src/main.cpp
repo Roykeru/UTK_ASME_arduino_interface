@@ -1,5 +1,5 @@
 
-#include "message.h"
+#include "messageReader.h"
 #include <Servo.h>
 
 #define NUM_MOTORS 6
@@ -26,6 +26,23 @@ struct motor_message_t {
 	byte value;
 };
 
+
+int main() {
+    init();
+
+#if defined(USBCON)
+    USB.attach();
+#endif
+
+    setup();
+
+    while (1) {
+        loop();
+        if (serialEventRun) serialEventRun();
+    }
+
+    return 0;
+}
 
 //byte process_kill_message(
 byte process_motor_message(struct motor_message_t*, byte);
@@ -105,6 +122,7 @@ byte process_motor_message(struct motor_message_t *motor_message, byte size) {
 			
 		case 2:
 			mainFlippers.writeMicroseconds(1000 + (int)motors[motor_number].value * 5); //30 & 147
+			servoMotor.write(1000 + (int)motors[motor_number].value * 5);
 			break;
 			
 		case 3:
@@ -145,18 +163,18 @@ void loop(void){
 		haslostsignal = 0;
 	}
 	
-	if (millis() - timeout > lasttime){
+	/*if (millis() - timeout > lasttime){
 		if (!haslostsignal){
-			Serial.println("lost signal");
+			//Serial.println("lost signal");
 			haslostsignal = 1;
 		}
-		leftFrontMotor.writeMicroseconds(1500);
-		rightFrontMotor.writeMicroseconds(1500);
+		leftFrontMotor.writeMicroseconds(0);
+		rightFrontMotor.writeMicroseconds(0);
 		mainFlippers.writeMicroseconds(1500);
 		auxFlippers.writeMicroseconds(1500);
 		combineMotor.writeMicroseconds(1500);
 		servoMotor.writeMicroseconds(1500);
 		lasttime = millis();
-	}
-	
+	}*/
+
 }
